@@ -1,0 +1,5 @@
+This is the janus customization directory.
+
+I put all of my customizations to Janus in here.  Such as additional plugins and snippets.
+Custom keymappings are linked into here like so:
+  ~/.gvimrc.before -> .janus/rc/.gvimrc.before
