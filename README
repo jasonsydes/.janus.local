@@ -1,5 +1,6 @@
-This is the janus customization directory.
+There are three places that I store my janus customizations:
 
-I put all of my customizations to Janus in here.  Such as additional plugins and snippets.
-Custom keymappings are linked into here like so:
-  ~/.gvimrc.before -> .janus/rc/.gvimrc.before
+1. .janus/          - janus pathogen 'bundle' directory AND snipmate directory.  That's it!
+2. .janus.local/    - janus customizations: .vimrc.before (custom keymappings)
+3. .janus.var/      - variable stuff, such as sessions, caches, vimdirs, etc 
+
