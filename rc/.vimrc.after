@@ -1,0 +1,72 @@
+
+
+
+
+" Vim UI {
+  color molokai              " load a colorscheme
+  " color ir_black              " load a colorscheme
+  " color wombat              " load a colorscheme
+  " color zenburn              " load a colorscheme
+  " color solarized              " load a colorscheme
+  "color sunburst              " load a colorscheme
+
+" }
+
+
+
+
+
+" Key (re)Mappings {
+
+  " Avoid the <escape> key to exit insert mode.  Instead just hit 'x' and 'z'
+  " at the same time.
+  "
+  " Note - Previously, I had this mapped to 'jk' / 'kj', but I discovered two
+  " problems with this:
+  " * I apparently frequently type k or j as the last character in an INSERT
+  "   mode burst.  Subsequently escaping with jk or kj would (depending upon
+  "   context) delete the j or k, and move the cursor up or down a line.
+  " * I want to have an "escape" keycode that I can also use in VISUAL mode.
+  "   Unfortunately, using jk/kj makes VISUAL mode navigation visually slow
+  "   (because VIM is waiting for the user to enter the next j or k or for
+  "   timeout to expire before visually moving the cursor. EDIT - Actually, the
+  "   real problem is if I'm in VISUAL  or VISUAL LINE mode, and while trying
+  "   to select a set of lines, I overshoot and have to go back one line.  That
+  "   results in pushing 'jk' or 'kj', which escapes me out.
+  " 
+  " Wikipedia indicates that x and z are not that frequently used, and they
+  " happen to be close together, so I'm giving those a whirl.
+  "
+  " One potential problem with this is that I don't want to map xz because 'x'
+  " in visual mode is delete/yank, and I don't want to slow down that command
+  " (even though at the moment I don't really use it that much).  That said,
+  " two possible solutions are:
+  "   * map xx to x (use noremap here, I think, right?), so that I can get
+  "     a speedier delete/yank.
+  "   * simply map only zx but not xz in VISUAL mode (but keep both mappings
+  "     for INSERT mode.
+  " 
+  " ok, just realized that 'x' is also delete in normal mode.  this has
+  " unfortunate effect of actually deleting a character if you hit 'x' first.
+  " better to train your muscle memory for 'zx' only, and NOT 'xz'.
+  "
+  " Ok, so now I'm beginning to think that the traditional <C-[> is perhaps the
+  " best ESC key of all, now that I have my CAPS LOCK key rebound. I'll have to
+  " think about this one quite a bit.
+  "
+  " Ok, not that I don't like the C-[, but I can't unmap it to train myself (it
+  " IS <esc> after all).  So someone suggested ii, and that seems pretty cool,
+  " so I'll do that.
+
+  inoremap ii <ESC>
+  vnoremap ii <ESC>
+  cnoremap ii <ESC>
+  " And of course, train your fingers to actually use this little goodie.
+  inoremap <ESC> <nop>
+  vnoremap <ESC> <nop>
+  cnoremap <ESC> <nop>
+  
+  " Use ; instead of : to enter normal mode commands
+  nnoremap ; :
+
+" }

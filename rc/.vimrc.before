@@ -1,0 +1,7 @@
+" Key (re)Mappings {
+
+  " Leader key mapped to ',' (instead of '\')
+  let mapleader = ','
+  "let maplocalleader='\'
+  
+" }
