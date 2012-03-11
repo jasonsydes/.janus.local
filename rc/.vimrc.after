@@ -1,8 +1,58 @@
+" General {
 
+  set shortmess+=filnxtToO        " abbrev. of messages (avoids 'hit enter') - Vim default
+  "set shortmess+=filmnrxoOtT     " abbrev. of messages (avoids 'hit enter') - Steve Francia's suggestion
+  set viewoptions=folds,options,cursor,unix,slash " better unix / windows compatibility
+  set virtualedit=onemore       " allow for cursor beyond last character (default)
+  set history=1000          " Store a ton of history (default is 20)
 
+  " Setup directories (backup, views, swap, undo) {
+    " see InitializeDirectories() at bottom for how these dirs are managed.
+    set backup            " backups are nice ...
+    set undofile          " so is persistent undo ... (undos are saved to <FILENAME>.un~)
+    set undolevels=1000 "maximum number of changes that can be undone
+    set undoreload=10000 "maximum number lines to save for undo on a buffer reload
+  " }
+
+  " Setup view saving/loading (i.e. saved foldings){
+    " Views basically save your code foldings.
+    " For overview of views, see http://vim.wikia.com/wiki/Make_views_automatic
+    " For solution used here, see http://ebonhand.wordpress.com/2011/03/30/automatically-save-and-load-vim-views-folds/
+
+    " Steve Francia's solution (some people report errors with this setup)
+    " au BufWinLeave * silent! mkview  "make vim save view (state) (folds, cursor, etc)
+    " au BufWinEnter * silent! loadview "make vim load view (state) (folds, cursor, etc)
+
+    " Supposedly error free automatically saved foldings.
+    " From http://ebonhand.wordpress.com/2011/03/30/automatically-save-and-load-vim-views-folds/
+    "
+    " Jason - WARNING - This autosave foldings stanza MAY slow down INSERT mode.
+    "   I was able to isolate it to here, but then in attempts to isolate any weird interactions with
+    "   of this stanza with other config settings, I ended up deleting ~/.vimdirs/views/, and that
+    "   seemed to fix the problem.  Completely fix the problem.
+    "   
+    "   Really.  I commented/uncommented this stanza over and over, and sure enough, it would slow
+    "   down VIM significantly when uncommented, and not when commented.  But after 
+    "   deleting ~/.vimdirs/views/, no more slowdown.  Huh.  Leaving enabled for now.
+    "
+    set viewoptions-=options
+    augroup vimrc
+      autocmd BufWritePost *
+      \   if expand('%') != '' && &buftype !~ 'nofile'
+      \|      mkview
+      \|  endif
+      autocmd BufRead *
+      \   if expand('%') != '' && &buftype !~ 'nofile'
+      \|      silent loadview
+      \|  endif
+    augroup END
+  " }
+" }
 
 
 " Vim UI {
+
+  " color
   color molokai              " load a colorscheme
   " color ir_black              " load a colorscheme
   " color wombat              " load a colorscheme
@@ -10,9 +60,126 @@
   " color solarized              " load a colorscheme
   "color sunburst              " load a colorscheme
 
+  " font
+  set guifont=Monaco:h13
+
+  set tabpagemax=15                 " only show 15 tabs (default 10)
+  " set showmode                    " display the current mode - janus default
+
+  " LET"S NOT DO THIS ANYMORE!!!
+  " set cursorline                " highlight current line (slower redrawing)
+  " hi CursorLine guibg=#333333   " highlight bg color of current line - doesn't seem to do anything
+  " hi CursorColumn guibg=#333333   " highlight cursor - doesn't seem to do anything
+
+  " Searching {
+
+    " Search Higlighting {
+      set showmatch         " show matching brackets/parenthesis
+      " set incsearch         " find as you type search - janus default
+      " set hlsearch          " highlight search terms - janus default
+    " }
+
+    " Intelligent case-sensitive search {
+      " set ignorecase  " case insensitive search - janus default
+      " set smartcase   " case sensitive when uc present - janus default
+    " }
+
+    " Do Perl compatible regex formatting by 'default' {
+      nnoremap / /\v
+      vnoremap / /\v
+      nnoremap ? ?\v
+      vnoremap ? ?\v
+      " For 'normal' vim searching, either backspace out the \v, or
+      " or do CMD-/ (unfortunately, CMD-? opens up the help window in Mac.)
+    " }
+  " }
+    
+  " Ruler/Status Line {
+  
+    if has('cmdline_info')
+      set ruler                   " show the ruler
+      set rulerformat=%30(%=\:b%n%y%m%r%w\ %l,%c%V\ %P%) " a ruler on steroids
+      set showcmd                 " show partial commands in status line and selected characters/lines in visual mode
+    endif
+
+    if has('statusline')
+      set laststatus=2    " Apparently always show the status line
+
+      " Broken down into easily includeable segments
+      set statusline=%<%f\                      " Filename
+      set statusline+=%w%h%m%r                  " Options
+      set statusline+=%{fugitive#statusline()}  " Git Hotness
+      set statusline+=\ [%{&ff}/%Y]             " filetype
+      set statusline+=\ [%{getcwd()}]           " current dir
+      "set statusline+=\ [A=\%03.3b/H=\%02.2B]  " ASCII / Hexadecimal value of char
+      set statusline+=%=%-14.(%l,%c%V%)\ %p%%   " Right aligned file nav info
+    endif
+
+  " }
+  
+
+  " set backspace=indent,eol,start  " backspace for dummys - janus default
+  " set linespace=0         " No extra spaces between rows - janus default
+  set rnu                 " Use relative line numbering instead (a.k.a. relativenumber) - use 'set nu' to return to normal highlighting
+  set winminheight=0        " windows can be 0 line high 
+  set wildmenu                    " show list instead of just completing
+  set wildmode=list:longest,full  " command <Tab> completion, list matches, then longest common part, then all.
+  set whichwrap=b,s,h,l,<,>,[,] " Wrap to next/prev line when moving cursor (backspace and cursor keys)
+  set scrolljump=5        " lines to scroll when cursor leaves screen (default: 1)
+  set scrolloff=3         " minimum lines to keep above and below cursor
+  " set foldenable          " auto fold code - janus default
+  set gdefault            " Always use global search/replace - the /g flag on :s substitutions by default
+  
+  set listchars=tab:>.,trail:.,extends:#,nbsp:.         " Highlight problematic whitespace - Steve Francia's suggestion
+  set listchars=tab:▸\ ,eol:¬                           " Steve Losh's suggestion
+  set listchars=tab:▸\ ,eol:¬,trail:.,extends:#,nbsp:.  " Steve-Steve combo
+  set nolist
+
+  runtime ftplugin/man.vim      " Turn on Manual page access
+
+  " To make things 'better' {
+    " See: http://stevelosh.com/blog/2010/09/coming-home-to-vim/
+    set hidden
+    set visualbell
+    set ttyfast
+  " } 
+
 " }
 
 
+
+" Formatting {
+
+  "set autoindent                  " indent at the same level of the previous line -- disabling, doesn't appear to do anything?
+  "set matchpairs+=<:>              " match, to be used with % 
+  "set comments=sl:/*,mb:*,elx:*/  " auto format comment blocks (??)
+
+  " Toggle paste mode
+  " Janus way:
+  nmap <silent> <F8> :set invpaste<CR>:set paste?<CR>
+  imap <silent> <F8> <ESC>:set invpaste<CR>:set paste?<CR>
+  " Old way:
+  " set pastetoggle=<F8>
+
+  " Wrapping, by Steve Losh {
+    set wrap
+    set textwidth=79
+    set colorcolumn=85          " vertical red line at 85th column
+    set formatoptions+=qrn1     " see help fo-table
+                                " q - Allow formatting of comments with 'gq'
+                                " r - Automatically insert the current comment leader after hitting <Enter> in Insert mode.
+                                " n - When formatting text, recognize numbered lists. (e.g. 1., 2., etc)
+                                " 1 - Don't break a line after a one-letter word.  It's broken before it instead (if possible).
+  " }
+
+  " Disabling for now, because I don't like the idea of my files always getting edited.
+  " But for a long time this appeared to work just fine.
+  "
+  " " Remove trailing whitespaces and ^M chars {
+  "   autocmd FileType c,cpp,java,php,js,python,twig,xml,yml autocmd BufWritePre <buffer> :call setline(1,map(getline(1,"$"),'substitute(v:val,"\\s\\+$","","")'))
+  " " }
+  
+" }
 
 
 
@@ -66,7 +233,356 @@
   vnoremap <ESC> <nop>
   cnoremap <ESC> <nop>
   
+  " Move (simply) beyond the closing element added by plugins. 
+  "   e.g. delimitMate, AutoClose, etc, can all add closing parentheses.
+  imap ,, <right>
+    
   " Use ; instead of : to enter normal mode commands
   nnoremap ; :
+  
+  " Easier moving in tabs and windows - This version one vertically maximizes the window after moving to it
+  "map <C-J> <C-W>j<C-W>_
+  "map <C-K> <C-W>k<C-W>_
+  "map <C-L> <C-W>l<C-W>_
+  "map <C-H> <C-W>h<C-W>_
+
+  " Easier moving in tabs and windows - This version does *not* vertically maximize the window after moving to it.
+  map <C-h> <C-w>h
+  map <C-j> <C-w>j
+  map <C-k> <C-w>k
+  map <C-l> <C-w>l
+  
+  " If you like long lines with line wrapping enabled, this solves the 
+  " problem that pressing down jumpes your cursor "over" the current 
+  " line to the next line. It changes behaviour so that it jumps to 
+  " the next row in the editor (much more natural):
+  " Note that Jason thinks that maaaaybe this slows down screen scrolling?
+  nnoremap j gj
+  nnoremap k gk
+  nnoremap <down> gj
+  nnoremap <up> gk
+  
+  " Avoid the arrow keys (in both normal and insert mode and visual mode)
+  " ... Disabling for now, can't remember why.
+  "nnoremap <up> <nop>
+  "nnoremap <down> <nop>
+  "nnoremap <left> <nop>
+  "nnoremap <right> <nop>
+  "inoremap <up> <nop>
+  "inoremap <down> <nop>
+  "inoremap <left> <nop>
+  "inoremap <right> <nop>
+  "vnoremap <up> <nop>
+  "vnoremap <down> <nop>
+  "vnoremap <left> <nop>
+  "vnoremap <right> <nop>
+
+  " Jason - I have no idea what this does. From Steve Francia's config.
+  " The following two lines conflict with moving to top and bottom of the screen.
+  " If you prefer that functionality, comment them out.
+  "map <S-H> gT          
+  "map <S-L> gt
+  
+  " Stupid shift key fixes - for command line mode looks like?
+  "cmap W w            
+  "cmap WQ wq
+  "cmap wQ wq
+  "cmap Q q
+  "cmap Tabe tabe
+
+  " Yank from the cursor to the end of the line, to be consistent with C and D.
+  " 'Y' normally yanks the entire line.  Instead, simply use 'yy' which does the same.
+  nnoremap Y y$
+
+  " Code folding options
+  " Use za to toggle folding at cursor
+  " Use zm and zr to do (m)ore or (r)educed folding globally.
+  nmap <leader>f0 :set foldlevel=0<CR>
+  nmap <leader>f1 :set foldlevel=1<CR>
+  nmap <leader>f2 :set foldlevel=2<CR>
+  nmap <leader>f3 :set foldlevel=3<CR>
+  nmap <leader>f4 :set foldlevel=4<CR>
+  nmap <leader>f5 :set foldlevel=5<CR>
+  nmap <leader>f6 :set foldlevel=6<CR>
+  nmap <leader>f7 :set foldlevel=7<CR>
+  nmap <leader>f8 :set foldlevel=8<CR>
+  nmap <leader>f9 :set foldlevel=9<CR>
+  " Warning:
+  " Using the following makes INSERT mode *incredibly* slow:
+  "   set foldmethod=syntax                   " Make ruby fold code properly 
+  " Looks like this is a known problem:
+  "   http://vim.wikia.com/wiki/Keep_folds_closed_while_inserting_text
+
+  " Toggle highlighted search by typing ,<space>
+  "   - i.e. gets rid of distracting highlighting once you've found what you want)
+  "   - 'noh' equivalent to 'nohlsearch')
+  "   - janus uses <leader>hs
+  "nnoremap <leader><space> :noh<cr>                  " Steve Losh's version    - turns off only  
+  "nmap <silent> <leader>/ :nohlsearch<CR>            " Steve Francia's version - turns off only
+  nmap <leader><space> :set hlsearch! hlsearch?<cr>   " Toggles - adapted from janus
+
+  " Change Working Directory to that of the current file or the one above.
+  " Usage:
+  "   :cd.       -- changes to working directory of the current file
+  "   :cd..      -- changes to parent of the working directory of the current file
+  cmap cd. lcd %:p:h
+  cmap cd.. lcd %:p:h/..
+
+  " visual shifting (does not exit Visual mode)
+  " DISABLED 
+  "   - Instead, use Janus' D-[ and D-] (or C-[ and C-] in commandline mode)
+  "vnoremap < <gv
+  "vnoremap > >gv 
+
+  " Fix home and end keybindings for screen, particularly on mac
+  " - For some reason this fixes the arrow keys too. huh.
+  " - Not sure why I have this disabled now.... 2012/03/17
+  "map [F $
+  "imap [F $
+  "map [H g0
+  "imap [H g0
+
+  " Some Steve Losh leaders {
+    " ,W  - Strip all trailing whitespace in the current file
+    nnoremap <leader>W :%s/\s\+$//<cr>:let @/=''<CR>      
+    " ,ev - open up vimrc in vsplit for quick editing.
+    nnoremap <leader>ev <C-w><C-v><C-l>:e $MYVIMRC<cr>    
+    " ,q - re-hardwrap paragraphs of text:
+    nnoremap <leader>q gqip       
+    " ,v - reselect the text that was just pasted / edited (though see below
+    " for better incarnation)
+    nnoremap <leader>v V`]        
+    " gv - reselect the text that was visually highlighted (builtin cmd)
+    " gV - reselect the text that was just pasted / edited
+    nnoremap gV V`]
+  " }
+
+  " Experimental Leaders {
+    " Put the output from the most recent command into a new window.
+    " For example:
+    "     :map
+    "     <F3>
+    " will stick the output of the map command into a new window.
+    " Inspired by http://www.rayninfo.co.uk/vimtips.html
+    nmap <F3>  :redir @a<CR>@:<CR>:redir END<CR>:new<CR>:put! a<CR><CR>
+
+    " These make window resizing faster, BUT I DON'T LIKE THE BINDING
+    " but i haven't been able to get <C--> and <C-=> to work
+    "nnoremap <silent> + :exe "resize " . (winheight(0) * 3/2)<CR>
+    "nnoremap <silent> - :exe "resize " . (winheight(0) * 2/3)<CR>
+    "nnoremap <silent> <M-+> :exe "resize " . (winheight(0) * 3/2)<CR>
+    "nnoremap <silent> <M--> :exe "resize " . (winheight(0) * 2/3)<CR>
+  " }
+  
+  " Experimental Other { 
+    " ctrl-l - textmate style insertion of ' => '
+    imap <C-l> <space>=><space>
+  " }
 
 " }
+
+
+
+
+" Plugins {
+
+  " ===== Plugins added by Janus =====
+ 
+  " Ack {}
+  " CtrlP {}
+  
+  " NerdCommenter {
+    " Comment out entire lines (treats visual 'v' like 'V' effectively)
+    let NERDCommentWholeLinesInVMode=1
+    
+    " Add/Remove a space when commenting/uncommenting
+    let NERDRemoveExtraSpaces = 1
+    let NERDSpaceDelims = 1
+  " }
+  
+  " NerdTree {
+    " Experimental - "Reveal File" in NerdTree.
+    "     Note - Conflicts with vim-rspec's "Run Spec".  Overwriting for now.
+    nmap <D-R> :NERDTreeFind<CR>
+
+    " Ignore additional files beyond janus.
+    let NERDTreeIgnore += ['\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
+    " Show hidden files
+    let NERDTreeShowHidden=1
+
+    " Untested Options from old config
+    " let NERDTreeShowBookmarks=1
+    " let NERDTreeChDirMode=0
+    " let NERDTreeQuitOnOpen=1
+    " let NERDTreeKeepTreeInNewTab=1    
+  " }
+  
+  " SuperTab {}
+  
+  " Surround {
+    " Temporary fix so that visual block mode command 's' isn't overwritten by
+    " Surround.
+    " autocmd VimEnter * xunmap s
+  " }
+
+  " Syntastic {}
+  
+  " Tagbar {
+      " Sort by appearance in file. (Can toggle by hitting 's' in tagbar window)
+      let g:tagbar_sort = 0
+      " ,tb - open the Tagbar window
+      nnoremap <leader>tb :TagbarToggle<cr>
+  " }
+  
+  " EasyMotion {}
+  " NrrwRgn {}
+  " Fugitive {}
+  " ZoomWin {}
+  " BufferGator {}
+  
+  " ===== Plugins added by Jason =====
+    
+  " " sessionman - Session List {
+  "   set sessionoptions=blank,buffers,curdir,folds,tabpages,winsize
+  "   nmap <leader>sl :SessionList<CR>
+  "   nmap <leader>ss :SessionSave<CR>
+  " " }
+
+  " session - Session Management {
+    " key remappings
+    nmap <leader>so :OpenSession<CR>
+    nmap <leader>sl :OpenSession<CR>
+    " Provide command aliases, like SessionOpen, SessionDelete, etc 
+    let g:session_command_aliases = 1
+    " Try to load the last session that was running (still will give prompt)
+    let g:session_default_to_last = 'on'
+    " Automatically save sessions
+    let g:session_autosave = 'on'
+  " }
+
+	" Align {
+	
+		" ,at# - Align trailing # comments.
+		"			This:
+		"				a = 5	# set a
+		"				bigbug = 123 # set bigbug
+		"			Becomes:
+		"				a = 5        # set a
+		"				bigbug = 123 # set bigbug
+		"
+		nmap <Leader>at# :Align W= #
+		vmap <Leader>at# :Align W= #
+    " ,at" - Align trailing " comments.
+		nmap <Leader>at" :Align W= "
+		vmap <Leader>at" :Align W= "
+
+		" Experimental - Align datamapper-like stanzas
+		nmap <Leader>ad :Align , => #
+		vmap <Leader>ad :Align , => #
+    
+    " Standard Alignments.
+    nmap <Leader>a- :Align -<CR>
+    vmap <Leader>a- :Align -<CR>
+    nmap <Leader>a= :Align =<CR>
+    vmap <Leader>a= :Align =<CR>
+    nmap <Leader>a: :Align :<CR>
+    vmap <Leader>a: :Align :<CR>
+    nmap <Leader>a:: :Align :\zs<CR>
+    vmap <Leader>a:: :Align :\zs<CR>
+    nmap <Leader>a, :Align ,<CR>
+    vmap <Leader>a, :Align ,<CR>
+    nmap <Leader>a<Bar> :Align <Bar><CR>
+    vmap <Leader>a<Bar> :Align <Bar><CR>
+    nmap <Leader>a# :Align #<CR>
+    vmap <Leader>a# :Align #<CR>
+	" }
+
+
+
+
+
+" These are the initial list of plugins that janus apparently doesn't have.
+"	DrawIt
+"	FuzzyFinder
+"	Greplace
+"	ShowMarks
+"	SunburstVIM
+"	YankRing
+"	align
+"	datamapper
+"	delimitMate
+"	easytags
+"	hammer
+"	obviousmode
+"	rainbow_parentheses.vim
+"	rspec
+"	scratch.vim
+"	screen
+"	securemodelines
+"	sessionman
+"	tabular
+"	upAndDown
+"	vcscommand
+"	vim-R-plugin
+"	vim-colorschemes
+"	vim-indent-guides
+"	vim-l9
+"	vim-repeat
+"	vim-textobj-rubyblock
+"	vim-textobj-user
+"	yard
+	
+" }	
+
+
+
+
+
+" ------------------------------------
+
+" Functions {
+
+  " Eliminates swap and backup files from littering directories, preferring to store in a central location.
+  " Also does this for views and undo files.
+  function! InitializeDirectories()
+    let separator = "."
+    let parent = $HOME . '/.vimdirs'
+    let dir_list = { 
+          \ 'backup': 'backupdir', 
+          \ 'views': 'viewdir', 
+          \ 'swap': 'directory', 
+          \ 'undo': 'undodir' }
+
+    for [dirname, settingname] in items(dir_list)
+      let directory = parent . '/' . dirname . "/"
+      if exists("*mkdir")
+        if !isdirectory(directory)
+          call mkdir(directory, 'p')
+        endif
+      endif
+      if !isdirectory(directory)
+        echo "Warning: Unable to create backup directory: " . directory
+        echo "Try: mkdir -p " . directory
+      else  
+            let directory = substitute(directory, " ", "\\\\ ", "")
+            exec "set " . settingname . "=" . directory
+      endif
+    endfor
+  endfunction
+  call InitializeDirectories() 
+
+" }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
