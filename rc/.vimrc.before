@@ -5,3 +5,46 @@
   "let maplocalleader='\'
   
 " }
+
+
+" Plugins {
+  " session - Session Management {
+    " Provide command aliases, like SessionOpen, SessionDelete, etc 
+    let g:session_command_aliases = 1
+
+    " Try to load the last session that was running (still will give prompt)
+    let g:session_default_to_last = 1
+    " Don't prompt when loading the last that was running
+    let g:session_autoload = 'yes'
+
+    " Automatically save sessions
+    let g:session_autosave = 'yes'
+    " Save sessions to ~/.vimdirs/sessions/
+    let g:session_directory = '~/.vimdirs/sessions'
+  " }
+
+  " vim-pad {
+    let g:pad_dir='~/Dropbox/notes'
+  " }
+  
+  "" minibufexpl {
+  "  " Use a single click to open a buffer
+  "  let g:miniBufExplUseSingleClick = 1
+  "
+  "  " Hack for now:
+  "  " Map S-M-[ and S-M-] to prev/next buffer respectively
+  "  let g:miniBufExplMapCTabSwitchBufs = 1
+  "  " noremap <S-M-]> <C-TAB>
+  "  " noremap <S-M-[> <C-S-TAB>    
+  ""}
+  
+  " buffet (replacement for buffergator) {
+    " Turn off buffergator
+    let g:buffergator_suppress_keymaps = 1
+    " ,b opens buffet
+    nnoremap <silent> <Leader>b :Bufferlist<CR>
+  " }
+  
+  
+  
+" }

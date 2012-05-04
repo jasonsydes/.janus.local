@@ -14,6 +14,16 @@
     set undoreload=10000 "maximum number lines to save for undo on a buffer reload
   " }
 
+  " Leave insert mode when saving or when losing focus.
+  " TODO: Make these options toggleable.
+  "   When saving with <D-s> in MacVim:
+  au BufWritePost * stopinsert  
+  "   When losing focus (see http://superuser.com/questions/236534/change-to-normal-mode-when-macvim-goes-background):
+  "   Turning off for now, because it makes it hard to cmd-tab back and
+  "   forth between something you're trying to copy off of
+  "   a documenation site into vim.
+  " au FocusLost,TabLeave * call feedkeys("\<C-\>\<C-n>")
+  
   " Setup view saving/loading (i.e. saved foldings){
     " Views basically save your code foldings.
     " For overview of views, see http://vim.wikia.com/wiki/Make_views_automatic
@@ -62,6 +72,16 @@
 
   " font
   set guifont=Monaco:h13
+
+  " Set obvious mode to more obvious colors
+  "   insert mode - red
+  "   normal mode, saved - gray
+  "   normal mode, modified - green
+  let g:obviousModeInsertHi             = 'term=italic ctermbg=52            guibg=black    guifg=red'
+  let g:obviousModeCmdwinHi             = 'term=italic ctermbg=22            guibg=darkblue guifg=darkgray'
+  let g:obviousModeModifiedCurrentHi    = 'term=italic ctermbg=30            guibg=lightcyan guifg=darkgreen'
+  let g:obviousModeModifiedNonCurrentHi = 'term=italic ctermbg=30            guibg=darkcyan guifg=darkgreen'
+  let g:obviousModeModifiedVertSplitHi  = 'term=italic ctermfg=22 ctermbg=30 guibg=darkcyan guifg=darkblue'
 
   set tabpagemax=15                 " only show 15 tabs (default 10)
   " set showmode                    " display the current mode - janus default
@@ -164,7 +184,8 @@
   " Wrapping, by Steve Losh {
     set wrap
     set textwidth=79
-    set colorcolumn=85          " vertical red line at 85th column
+    set colorcolumn=85          " vertical dark blue line at 85th column
+    hi ColorColumn term=reverse ctermbg=4 guibg=darkblue  
     set formatoptions+=qrn1     " see help fo-table
                                 " q - Allow formatting of comments with 'gq'
                                 " r - Automatically insert the current comment leader after hitting <Enter> in Insert mode.
@@ -229,9 +250,12 @@
   vnoremap ii <ESC>
   cnoremap ii <ESC>
   " And of course, train your fingers to actually use this little goodie.
-  inoremap <ESC> <nop>
-  vnoremap <ESC> <nop>
-  cnoremap <ESC> <nop>
+  " Fingers Trained!  Now try to train your fingers to use <C-[>, which is also
+  " ESC.
+  " Rather, train your fingers to use <CAPSLOCK-[>, which is the best ESC.
+  " inoremap <ESC> <nop>
+  " vnoremap <ESC> <nop>
+  " cnoremap <ESC> <nop>
   
   " Move (simply) beyond the closing element added by plugins. 
   "   e.g. delimitMate, AutoClose, etc, can all add closing parentheses.
@@ -349,6 +373,7 @@
     nnoremap <leader>ev <C-w><C-v><C-l>:e $MYVIMRC<cr>    
     " ,q - re-hardwrap paragraphs of text:
     nnoremap <leader>q gqip       
+    vnoremap <leader>q gq 
     " ,v - reselect the text that was just pasted / edited (though see below
     " for better incarnation)
     nnoremap <leader>v V`]        
@@ -388,7 +413,13 @@
 
   " ===== Plugins added by Janus =====
  
-  " Ack {}
+  " Ack {
+    " Do not immediately overwrite the current buffer when you run Ack.
+    " This way, you won't lose your place.
+    " See: https://github.com/mileszs/ack.vim/issues/31
+    " Basically, we're just replacing ':Ack' with ':Ack!'
+    map <D-F> :Ack!<space>
+  " }
   " CtrlP {}
   
   " NerdCommenter {
@@ -410,10 +441,16 @@
     " Show hidden files
     let NERDTreeShowHidden=1
 
+    " Don't close NerdTree after opening
+    let NERDTreeQuitOnOpen=1
+    
+    " NerdTree on the right
+    let NERDTreeWinPos='right'
+    
+
     " Untested Options from old config
     " let NERDTreeShowBookmarks=1
     " let NERDTreeChDirMode=0
-    " let NERDTreeQuitOnOpen=1
     " let NERDTreeKeepTreeInNewTab=1    
   " }
   
@@ -451,13 +488,7 @@
   " session - Session Management {
     " key remappings
     nmap <leader>so :OpenSession<CR>
-    nmap <leader>sl :OpenSession<CR>
-    " Provide command aliases, like SessionOpen, SessionDelete, etc 
-    let g:session_command_aliases = 1
-    " Try to load the last session that was running (still will give prompt)
-    let g:session_default_to_last = 'on'
-    " Automatically save sessions
-    let g:session_autosave = 'on'
+    nmap <leader>sl :OpenSession<CR>    
   " }
 
 	" Align {
@@ -496,6 +527,52 @@
     nmap <Leader>a# :Align #<CR>
     vmap <Leader>a# :Align #<CR>
 	" }
+
+  "" minibufexpl {
+  "  " Hack for now:
+  "  " Map S-M-[ and S-M-] to prev/next buffer respectively
+  "  " let g:miniBufExplMapCTabSwitchBufs = 1
+  "  nmap <S-M-]> <C-TAB>
+  "  nmap <S-M-[> <C-S-TAB>
+  "  
+  ""}
+
+  " Jason - Hrm, easytags and buftabs sort of conflict (not really, but sort of)."
+  "   Basically, this is the error easytags indicates:
+  "       easytags.vim 2.7.5: I'm being executed every 1 milliseconds! Please 
+  "       :set updatetime=4000. To find where 'updatetime' was changed 
+  "       execute ':verb set ut?'
+  "   However, it looks like buftabs may only transiently set it to 1ms (and then
+  "   sets it back).  Maybe.  Anyway...
+  " Jason - I removed buftabs for now.  Enabling easytags!
+  "
+  " EasyTags {
+    " I have no idea how much battery easytags eats in normal use.  Maybe a lot?
+    
+    " Basically, this setting (apparently along with rails.vim) ensures that the 
+    " tags file is located at RAILS_ROOT/tmp/tags....
+    " UPDATE: Actually, looks like it is (oddly) stored at .git/ruby.tags
+    let g:easytags_dynamic_files = 2
+
+    " Usage, generating:
+    "     On a new project, I think you need to do:
+    "         :UpdateTags -R .
+    "     Thereafter, it may 'just work'.
+    "     If not, then this may work:
+    "         :UpdateTags!
+    "     If not, then maybe resort to something like this:
+    "         nnoremap <leader>rt :UpdateTags -R --exclude=.git --exclude=log *
+    "
+    " Usage, navigating:
+    "     From http://smartic.us/2009/04/05/using-ctags-in-vim/
+    "     ^] – find a tag
+    "     ^T – go backwards
+    "     :tags – show where you’ve been
+    "     :tag – go somewhere in your tag stack
+    "     :tselect or g] – show where something is referenced
+    "     ^W-] – find a tag in a split window
+    "     help :tags
+  " }
 
 
 
