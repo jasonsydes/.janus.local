@@ -26,4 +26,9 @@ ln -s .janus.local/rc/.gvimrc.before
 ln -s .janus.local/rc/.vimrc.after
 ln -s .janus.local/rc/.vimrc.before
 
+# Initialize the submodules
+cd $HOME/.janus
+git submodule init
+git submodule update
+
 # First time you launch vim, it'll complain about some directories.
