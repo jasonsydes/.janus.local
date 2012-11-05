@@ -57,6 +57,16 @@
       \|  endif
     augroup END
   " }
+
+  " Crontab {
+    " See http://drawohara.com/post/6344279/crontab-temp-file-must-be-edited-in-place
+    " Using this approach requires that you also set the following in bashrc:
+    " alias crontab="VIM_CRONTAB=true crontab"
+    if $VIM_CRONTAB == "true"
+      set nobackup
+      set nowritebackup
+    endif
+  " }
 " }
 
 
@@ -71,7 +81,7 @@
   "color sunburst              " load a colorscheme
 
   " font
-  set guifont=Monaco:h13
+  set guifont=Monaco:h11
 
   " Set obvious mode to more obvious colors
   "   insert mode - red
@@ -140,13 +150,16 @@
 
   " set backspace=indent,eol,start  " backspace for dummys - janus default
   " set linespace=0         " No extra spaces between rows - janus default
-  set rnu                 " Use relative line numbering instead (a.k.a. relativenumber) - use 'set nu' to return to normal highlighting
+  " set rnu                 " Use relative line numbering instead (a.k.a. relativenumber) - use 'set nu' to return to normal numbering
+  set nu                 " Use absolute line numbering.
   set winminheight=0        " windows can be 0 line high 
   set wildmenu                    " show list instead of just completing
   set wildmode=list:longest,full  " command <Tab> completion, list matches, then longest common part, then all.
   set whichwrap=b,s,h,l,<,>,[,] " Wrap to next/prev line when moving cursor (backspace and cursor keys)
-  set scrolljump=5        " lines to scroll when cursor leaves screen (default: 1)
-  set scrolloff=3         " minimum lines to keep above and below cursor
+  " set scrolljump=5        " lines to scroll when cursor leaves screen (default: 1)
+  " set scrolloff=3         " minimum lines to keep above and below cursor
+  set scrolljump=9        " lines to scroll when cursor leaves screen (default: 1)
+  set scrolloff=5         " minimum lines to keep above and below cursor
   " set foldenable          " auto fold code - janus default
   set gdefault            " Always use global search/replace - the /g flag on :s substitutions by default
   
@@ -170,6 +183,30 @@
 
 " Formatting {
 
+  " Indentation/Tabs/Spaces {
+  
+    " This is really a great guide:
+    " http://tedlogan.com/techblog3.html
+
+    " Hopefully these 3 settings actually do somthing smart.
+    set smarttab
+    set smartindent
+    set autoindent
+    
+    " This makes tabs get displayed at 8 chars.
+    set tabstop=8
+    " expandtab always uses tabs instead of spaces.  We don't want that.
+    set noexpandtab
+    " Indents are 2 columns (using a mix of tabs and spaces).
+    set softtabstop=2
+    set shiftwidth=2
+
+    " FileType Specific Indentation Settings {
+      " Python (see http://wiki.python.org/moin/Vim)
+      au FileType python setlocal tabstop=8 expandtab shiftwidth=4 softtabstop=4
+    " }
+  " }
+ 
   "set autoindent                  " indent at the same level of the previous line -- disabling, doesn't appear to do anything?
   "set matchpairs+=<:>              " match, to be used with % 
   "set comments=sl:/*,mb:*,elx:*/  " auto format comment blocks (??)
@@ -245,25 +282,37 @@
   " Ok, not that I don't like the C-[, but I can't unmap it to train myself (it
   " IS <esc> after all).  So someone suggested ii, and that seems pretty cool,
   " so I'll do that.
-
-  inoremap ii <ESC>
-  vnoremap ii <ESC>
-  cnoremap ii <ESC>
+  "
+  " Ok, so I don't like 'ii' because of the delay it imposes on you when you
+  " actually want to just type 'i'.  I can't seem to get over the fact that the
+  " cursor just sits there in front of the i as I'm typing.  Other issues too.
+  " And I haven't had much luck with C-[.
+  " What is looking rather attractive is double-semicolon.  Let's try that for
+  " awhile. You may or may not want to use nnoremap ;; <ESC>;  If you do, then
+  " don't forget to disable "nnoremap ; :".
+  " inoremap ii <ESC>
+  " vnoremap ii <ESC>
+  " cnoremap ii <ESC>
+  inoremap ;; <ESC>
+  vnoremap ;; <ESC>
+  cnoremap ;; <ESC>
+  nnoremap ;; <ESC>
+  " map ;; <ESC>
   " And of course, train your fingers to actually use this little goodie.
   " Fingers Trained!  Now try to train your fingers to use <C-[>, which is also
   " ESC.
-  " Rather, train your fingers to use <CAPSLOCK-[>, which is the best ESC.
+  " Rather, train your fingers to use <C-[>, which is the best ESC.
   " inoremap <ESC> <nop>
   " vnoremap <ESC> <nop>
   " cnoremap <ESC> <nop>
+  
+  " Use ; instead of : to enter normal mode commands
+  " nnoremap ; :
   
   " Move (simply) beyond the closing element added by plugins. 
   "   e.g. delimitMate, AutoClose, etc, can all add closing parentheses.
   imap ,, <right>
     
-  " Use ; instead of : to enter normal mode commands
-  nnoremap ; :
-  
   " Easier moving in tabs and windows - This version one vertically maximizes the window after moving to it
   "map <C-J> <C-W>j<C-W>_
   "map <C-K> <C-W>k<C-W>_
@@ -331,9 +380,13 @@
   nmap <leader>f7 :set foldlevel=7<CR>
   nmap <leader>f8 :set foldlevel=8<CR>
   nmap <leader>f9 :set foldlevel=9<CR>
-  " Warning:
-  " Using the following makes INSERT mode *incredibly* slow:
-  "   set foldmethod=syntax                   " Make ruby fold code properly 
+  
+  " Set fold method.
+  set foldmethod=syntax
+  
+  " Using foldmethod=syntax for Ruby makes insert incredibly slow.
+  au FileType python setlocal foldmethod=manual
+  
   " Looks like this is a known problem:
   "   http://vim.wikia.com/wiki/Keep_folds_closed_while_inserting_text
 
@@ -549,11 +602,22 @@
   " EasyTags {
     " I have no idea how much battery easytags eats in normal use.  Maybe a lot?
     
+    " This will look in the current directory for "tags", and work up the tree
+    " towards root until one is found. IOW, you can be anywhere in your source
+    " tree instead of just the root of it.
+    " At least, according to
+    " http://stackoverflow.com/questions/563616/vim-and-ctags-tips-and-tricks
+    " set tags=./tags;/
+
     " Basically, this setting (apparently along with rails.vim) ensures that the 
     " tags file is located at RAILS_ROOT/tmp/tags....
     " UPDATE: Actually, looks like it is (oddly) stored at .git/ruby.tags
-    let g:easytags_dynamic_files = 2
+    " let g:easytags_dynamic_files = 2
+    " Instead, doing this:
+    set tags=./tags;
+    let g:easytags_dynamic_files = 1
 
+    
     " Usage, generating:
     "     On a new project, I think you need to do:
     "         :UpdateTags -R .
