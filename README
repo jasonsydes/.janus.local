@@ -2,5 +2,33 @@ There are three places that I store my janus customizations:
 
 1. .janus/          - janus pathogen 'bundle' directory AND snipmate directory.  That's it!
 2. .janus.local/    - janus customizations: .vimrc.before (custom keymappings)
-3. .janus.var/      - variable stuff, such as sessions, caches, vimdirs, etc 
+3. .janus.var/      - variable stuff, such as sessions, caches, vimdirs, etc
+                      (actually, currently this is in ~/.vimdirs/) 
 
+To do a fresh install:
+
+# Make sure you have vim 7.3 or higher
+vim --version
+
+# Install janus
+cd $HOME
+curl -Lo- http://bit.ly/janus-bootstrap | bash
+
+# check out .janus and .janus.local
+cd $HOME
+git clone git@github.com:jasonsydes/.janus.git
+git clone git@github.com:jasonsydes/.janus.local.git
+
+# symlinks for our custom vimrc stuff
+cd $HOME
+ln -s .janus.local/rc/.gvimrc.after
+ln -s .janus.local/rc/.gvimrc.before
+ln -s .janus.local/rc/.vimrc.after
+ln -s .janus.local/rc/.vimrc.before
+
+# Initialize the submodules
+cd $HOME/.janus
+git submodule init
+git submodule update
+
+# First time you launch vim, it'll complain about some directories.
