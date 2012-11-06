@@ -381,8 +381,9 @@
   nmap <leader>f8 :set foldlevel=8<CR>
   nmap <leader>f9 :set foldlevel=9<CR>
   
-  " Set fold method.
+  " Set fold method, and default to everything unfolded.
   set foldmethod=syntax
+  set foldlevel=99
   
   " Using foldmethod=syntax for Ruby makes insert incredibly slow.
   au FileType python setlocal foldmethod=manual
