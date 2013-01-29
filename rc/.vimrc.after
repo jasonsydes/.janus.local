@@ -193,13 +193,41 @@
     set smartindent
     set autoindent
     
-    " This makes tabs get displayed at 8 chars.
-    set tabstop=8
-    " expandtab always uses tabs instead of spaces.  We don't want that.
-    set noexpandtab
-    " Indents are 2 columns (using a mix of tabs and spaces).
-    set softtabstop=2
-    set shiftwidth=2
+    " " Mixture Style {
+    "   " Tabs are eight columns wide. Each indentation level is two columns,
+    "   " which may be spaces or tabs.
+
+    "   " This makes tabs get displayed at 8 chars.
+    "   set tabstop=8
+    "   " expandtab always uses tabs instead of spaces.  We don't want that.
+    "   set noexpandtab
+    "   " Indents are 2 columns (using a mix of tabs and spaces).
+    "   set softtabstop=2
+    "   set shiftwidth=2
+    " " }
+    
+    " " Tabs only style {
+    "   " Tabs are two columns wide. Each indentation level is one tab.
+
+    "   " This makes tabs get displayed at 2 chars.
+    "   set tabstop=2
+    "   " expandtab always uses tabs instead of spaces.  We don't want that.
+    "   set noexpandtab
+    "   " Indents are 2 columns
+    "   set softtabstop=2
+    "   set shiftwidth=2
+    " " }
+    
+    " Spaces only style {
+      " Each indentation level is four spaces. Tabs are not used.
+
+      " expandtab always uses tabs instead of spaces.
+      set expandtab
+      " Indents are 2 columns
+      set softtabstop=2
+      set shiftwidth=2
+    " }
+    
 
     " FileType Specific Indentation Settings {
       " Python (see http://wiki.python.org/moin/Vim)
