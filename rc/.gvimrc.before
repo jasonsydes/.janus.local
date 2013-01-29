@@ -1,0 +1,5 @@
+" Set the default opening window size of macvim
+set lines=40 columns=90
+
+" By default, hide the icon bar
+ set guioptions-=T 
