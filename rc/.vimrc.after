@@ -1,3 +1,9 @@
+" Filetypes {
+    " aReflex
+    autocmd BufRead,BufNewFile *.ams setlocal filetype=c
+    autocmd BufRead,BufNewFile *.reflex setlocal filetype=c
+" }
+
 " General {
 
   set shortmess+=filnxtToO        " abbrev. of messages (avoids 'hit enter') - Vim default
@@ -639,14 +645,16 @@
     "     help :tags
   " }
 
-
-
+  " EasyGrep {
+    " A nice tool for multi-file search and search/replace.
+    " Probably will get me 80% of the way to IDE-like refactoring.
+  " "}
 
 
 " These are the initial list of plugins that janus apparently doesn't have.
 "	DrawIt
 "	FuzzyFinder
-"	Greplace
+"	Greplace    -- I'll probably be using EasyGrep instead...
 "	ShowMarks
 "	SunburstVIM
 "	YankRing
