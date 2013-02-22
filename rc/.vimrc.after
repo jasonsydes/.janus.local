@@ -199,13 +199,41 @@
     set smartindent
     set autoindent
     
-    " This makes tabs get displayed at 8 chars.
-    set tabstop=8
-    " expandtab always uses tabs instead of spaces.  We don't want that.
-    set noexpandtab
-    " Indents are 2 columns (using a mix of tabs and spaces).
-    set softtabstop=2
-    set shiftwidth=2
+    " " Mixture Style {
+    "   " Tabs are eight columns wide. Each indentation level is two columns,
+    "   " which may be spaces or tabs.
+
+    "   " This makes tabs get displayed at 8 chars.
+    "   set tabstop=8
+    "   " expandtab always uses tabs instead of spaces.  We don't want that.
+    "   set noexpandtab
+    "   " Indents are 2 columns (using a mix of tabs and spaces).
+    "   set softtabstop=2
+    "   set shiftwidth=2
+    " " }
+    
+    " " Tabs only style {
+    "   " Tabs are two columns wide. Each indentation level is one tab.
+
+    "   " This makes tabs get displayed at 2 chars.
+    "   set tabstop=2
+    "   " expandtab always uses tabs instead of spaces.  We don't want that.
+    "   set noexpandtab
+    "   " Indents are 2 columns
+    "   set softtabstop=2
+    "   set shiftwidth=2
+    " " }
+    
+    " Spaces only style {
+      " Each indentation level is four spaces. Tabs are not used.
+
+      " expandtab always uses tabs instead of spaces.
+      set expandtab
+      " Indents are 2 columns
+      set softtabstop=2
+      set shiftwidth=2
+    " }
+    
 
     " FileType Specific Indentation Settings {
       " Python (see http://wiki.python.org/moin/Vim)
@@ -296,13 +324,16 @@
   " What is looking rather attractive is double-semicolon.  Let's try that for
   " awhile. You may or may not want to use nnoremap ;; <ESC>;  If you do, then
   " don't forget to disable "nnoremap ; :".
+  " Ok, actually, double-semicolon is terrible.  It means that for languages
+  " that end lines with semicolons, you always have to wait until you press
+  " cmd-S to save.  Terrible.  Disable
   " inoremap ii <ESC>
   " vnoremap ii <ESC>
   " cnoremap ii <ESC>
-  inoremap ;; <ESC>
-  vnoremap ;; <ESC>
-  cnoremap ;; <ESC>
-  nnoremap ;; <ESC>
+  " inoremap ;; <ESC>
+  " vnoremap ;; <ESC>
+  " cnoremap ;; <ESC>
+  " nnoremap ;; <ESC>
   " map ;; <ESC>
   " And of course, train your fingers to actually use this little goodie.
   " Fingers Trained!  Now try to train your fingers to use <C-[>, which is also
@@ -489,6 +520,11 @@
     " Add/Remove a space when commenting/uncommenting
     let NERDRemoveExtraSpaces = 1
     let NERDSpaceDelims = 1
+
+    " Use CPP style comments while in C.
+    " Ah, doesn't work, see https://github.com/scrooloose/nerdcommenter/issues/33
+    let NERD_c_alt_style=1
+    let NERD_C_alt_style=1
   " }
   
   " NerdTree {
