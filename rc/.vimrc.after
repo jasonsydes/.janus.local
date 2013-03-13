@@ -205,7 +205,7 @@
 
     "   " This makes tabs get displayed at 8 chars.
     "   set tabstop=8
-    "   " expandtab always uses tabs instead of spaces.  We don't want that.
+    "   " expandtab always uses space instead of tabs.  We don't want that.
     "   set noexpandtab
     "   " Indents are 2 columns (using a mix of tabs and spaces).
     "   set softtabstop=2
@@ -217,7 +217,7 @@
 
     "   " This makes tabs get displayed at 2 chars.
     "   set tabstop=2
-    "   " expandtab always uses tabs instead of spaces.  We don't want that.
+    "   " expandtab always uses space instead of tabs.  We don't want that.
     "   set noexpandtab
     "   " Indents are 2 columns
     "   set softtabstop=2
@@ -227,7 +227,7 @@
     " Spaces only style {
       " Each indentation level is four spaces. Tabs are not used.
 
-      " expandtab always uses tabs instead of spaces.
+      " expandtab always uses spaces instead of tabs.
       set expandtab
       " Indents are 2 columns
       set softtabstop=2
